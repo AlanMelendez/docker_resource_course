@@ -1,0 +1,51 @@
+version: '3'  # specify docker-compose version
+
+services:
+  db:  # specify service name (container-name)
+    container_name: postgres-db # specify container name
+    image: postgres:15.1  # specify image
+    volumes:
+     # -laboratorio:/var/lib/postgresql/data  # specify volume is already created.
+      - ./volumesdocker:/var/lib/postgresql/data  # specify volume is already created.
+    environment:
+      - POSTGRES_PASSWORD=123456  # specify environment variable
+    ports:
+      - "5432:5432"  # specify port
+
+  pgAdmin:
+    depends_on:
+      - db # specify dependency (the service name are that in line 4)
+    image: dpage/pgadmin4:6.17 # specify image
+    ports:
+      - "8080:80" # specify port (the same port which that in file laboratorio-4.3)
+    volumes:
+      - ./pgadminvolumes:/var/lib/pgadmin # specify volume
+    environment:
+      - PGADMIN_DEFAULT_PASSWORD=123456 # specify environment variable
+      - PGADMIN_DEFAULT_EMAIL=superman@google.com # specify environment variable
+    container_name: pgadmin4 # specify container name
+
+# volumes:
+#   laboratorio:  # specify volume name
+#    external: true  # specify volume is already created in the system, if volume isn't created ,will be created with that name.
+
+
+#! COMANDOS PARA INICIAR EL ARCHIVO:
+# docker-compose -f docker-compose-4.yml up -d
+# docker-compose -f docker-compose-4.yml down
+
+#! ERROR AL CORRER POR EL PGADMIN
+
+      # #pgadmin4   | ERROR  : Failed to create the directory /var/lib/pgadmin/sessions:
+      # pgadmin4   |            [Errno 13] Permission denied: '/var/lib/pgadmin/sessions'
+      # pgadmin4   | HINT   : Create the directory /var/lib/pgadmin/sessions, ensure it is writeable by
+      # pgadmin4   |          'pgadmin', and try again, or, create a config_local.py file
+      # pgadmin4   |          and override the SESSION_DB_PATH setting per
+      # pgadmin4   |          https://www.pgadmin.org/docs/pgadmin4/6.17/config_py.html
+      # pgadmin4   | Traceback (most recent call last):
+      # pgadmin4   |   File "/pgadmin4/pgadmin/setup/data_directory.py", line 82, in create_app_data_directory
+      # pgadmin4   |     _create_directory_if_not_exists(config.SESSION_DB_PATH)
+      # pgadmin4   |   File "/pgadmin4/pgadmin/setup/data_directory.py", line 20, in _create_directory_if_not_exists
+      # pgadmin4   |     os.mkdir(_path)
+
+#? sudo chown -R 5050:5050 pgadminvolumes -> name of directory where will saved the volumes # specify the user and group of the volume

@@ -1,0 +1,89 @@
+docker container run \
+--dp 3306:3306 \
+--name world-db \
+--env MARIADB_USER=alan \
+--env MARIADB_PASSWORD=alan123 \
+--env MARIADB_DATABASE=world-bdd \
+mariadb:jammy
+
+#NOMBRE DEL VOLUMEN
+docker volume ls  ----> bdd-prueba
+
+
+#! VOLUMEN DE NUESTRA IMAGEN:
+docker container run \
+-dp 3307:3306 \
+--name world-db \
+--env MARIADB_USER=alan \
+--env MARIADB_PASSWORD=alan123 \
+--env MARIADB_ROOT_PASSWORD=alan1234 \
+--env MARIADB_DATABASE=world-bdd \
+--volume bdd-prueba:/var/lib/mysql \
+mariadb:jammy
+
+
+
+#INSTALANDO PHPMYADMIN
+docker container run \
+ --name phpmyadmin \
+ -d \
+ -e PMA_ARBITRARY=1 \
+ -p 8080:80 \
+ phpmyadmin:5.2.0-apache 
+
+
+ #CREAR UNA RED CON DOCKER:
+  docker network create world-app
+    #Conectar contenedor ala red:
+    #! Primero PHPmyadmin
+    docker network connect world-app 5d4
+    docker network connect world-app world-db
+
+    #Para ver que se conectaron damos inspect
+    docker network inspect world-app
+
+
+#CREAR UN CONTENEDOR APUNTANDO DIRECTAMENTE A UNA RED.
+ docker container run \
+ --name phpmyadmin \
+ -d \
+ -e PMA_ARBITRARY=1 \
+ -p 8080:80 \
+ --network world-app \
+ phpmyadmin:5.2.0-apache
+
+
+
+ #CREAR UNA CONTAINER DE LINUX PARA UNA APP
+
+ /*
+  Este código es un archivo YAML que describe un comando para ejecutar un contenedor de Docker. Permíteme explicarte cada parte en detalle:
+
+```yaml
+docker container run \
+--name nest-app \
+-w /app \
+-dp 81:3000 \
+-v "$(pwd)":/app \
+node:18-alpine3.18 \
+sh -c "yarn install && yarn start:dev"
+```
+
+- `docker container run`: Este es el comando principal de Docker que se utiliza para ejecutar un contenedor.
+- `--name nest-app`: Esto establece el nombre del contenedor como "nest-app". Puedes cambiar este nombre según tus necesidades.
+- `-w /app`: Esto establece el directorio de trabajo dentro del contenedor como "/app". Es decir, cuando el contenedor se ejecute, el directorio actual será "/app".
+- `-dp 81:3000`: Esto mapea el puerto 81 de tu máquina host al puerto 3000 del contenedor. Esto significa que cuando accedas a `http://localhost:81` en tu navegador, se redirigirá al puerto 3000 dentro del contenedor.
+- `-v "$(pwd)":/app`: Esto monta el directorio actual de tu máquina host dentro del contenedor en el directorio "/app". Esto permite que los archivos de tu máquina host estén disponibles dentro del contenedor.
+- `node:18-alpine3.18`: Esto especifica la imagen de Docker que se utilizará para crear el contenedor. En este caso, se utiliza la imagen "node:18-alpine3.18", que es una versión específica de Node.js basada en Alpine Linux.
+- `sh -c "yarn install && yarn start:dev"`: Esto ejecuta un comando dentro del contenedor. En este caso, se utiliza el intérprete de comandos "sh" para ejecutar los comandos "yarn install" y "yarn start:dev". Estos comandos son específicos de la aplicación que se ejecutará dentro del contenedor.
+
+En resumen, este código ejecuta un contenedor de Docker utilizando la imagen de Node.js. El contenedor se ejecuta en segundo plano, mapea el puerto 81 de tu máquina host al puerto 3000 del contenedor, monta el directorio actual de tu máquina host dentro del contenedor y ejecuta los comandos "yarn install" y "yarn start:dev" dentro del contenedor. Esto es útil para ejecutar una aplicación Node.js en un entorno aislado y reproducible.
+ */
+
+
+
+
+
+
+ 
+ 
